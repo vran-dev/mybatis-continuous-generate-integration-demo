@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cc.cc1234.dao.mapper.UserMapper">
+
+    <select id="countUser" resultType="java.lang.Long">
+        select count(*)
+        from user
+    </select>
+
+    <select id="selectByUsername" resultType="cc.cc1234.dao.model.UserEntity">
+        select *
+        from user
+        where username = #{username}
+    </select>
+
+</mapper>

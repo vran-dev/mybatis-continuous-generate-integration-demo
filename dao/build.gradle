@@ -1,0 +1,47 @@
+plugins {
+    id 'java'
+    id "com.thinkimi.gradle.MybatisGenerator" version "2.3"
+}
+
+mybatisGenerator {
+    verbose = true
+    configFile = 'src/main/resources/mybatis-generator.xml'
+    targetDir = projectDir.getAbsolutePath()
+
+    dependencies {
+        mybatisGenerator group: 'org.mybatis.generator', name: 'mybatis-generator-core', version: '1.4.0'
+        mybatisGenerator group: 'mysql', name: 'mysql-connector-java', version: '8.0.25'
+        mybatisGenerator project(":generator-plugin")
+    }
+}
+
+mbGenerator.dependsOn {
+    System.setProperty("mybatis.generator.baseDir", mybatisGenerator.targetDir)
+
+    file("src/generator/java").list().each {
+        f -> delete "src/generator/java/${f}"
+    }
+    file("src/generator/resources").list().each {
+        f -> delete "src/generator/resources/${f}"
+    }
+}
+
+dependencies {
+    // mybatis
+    implementation group: 'org.mybatis.spring.boot', name: 'mybatis-spring-boot-starter'
+    implementation group: 'org.mybatis', name: 'mybatis'
+    implementation group: 'org.mybatis.generator', name: 'mybatis-generator-core'
+    implementation group: 'org.flywaydb', name: 'flyway-core'
+
+    // datasource
+    implementation group: 'com.zaxxer', name: 'HikariCP'
+    implementation group: 'mysql', name: 'mysql-connector-java'
+}
+
+sourceSets {
+    main {
+        java.srcDirs += ['src/generator/java']
+        resources.srcDirs += ['src/generator/resources']
+    }
+}
+

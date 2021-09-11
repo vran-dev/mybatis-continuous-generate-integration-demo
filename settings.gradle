@@ -1,0 +1,6 @@
+rootProject.name = 'mybatis3-generator-integration-demo'
+include 'api'
+include 'dao'
+include 'core'
+include 'generator-plugin'
+
