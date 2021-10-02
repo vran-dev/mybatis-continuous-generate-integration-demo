@@ -6,7 +6,6 @@ plugins {
 mybatisGenerator {
     verbose = true
     configFile = 'src/main/resources/mybatis-generator.xml'
-    targetDir = projectDir.getAbsolutePath()
 
     dependencies {
         mybatisGenerator group: 'org.mybatis.generator', name: 'mybatis-generator-core', version: '1.4.0'
@@ -16,12 +15,12 @@ mybatisGenerator {
 }
 
 mbGenerator.dependsOn {
-    System.setProperty("mybatis.generator.baseDir", mybatisGenerator.targetDir)
+    System.setProperty("mybatis.generator.baseDir", projectDir.getAbsolutePath())
 
-    file("src/generator/java").list().each {
+    file("src/generator/java")?.list()?.each {
         f -> delete "src/generator/java/${f}"
     }
-    file("src/generator/resources").list().each {
+    file("src/generator/resources")?.list()?.each {
         f -> delete "src/generator/resources/${f}"
     }
 }
