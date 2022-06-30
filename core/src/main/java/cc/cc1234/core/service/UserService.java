@@ -1,7 +1,6 @@
 package cc.cc1234.core.service;
 
 import cc.cc1234.dao.enums.Gender;
-import cc.cc1234.dao.mapper.AddressMapper;
 import cc.cc1234.dao.mapper.UserMapper;
 import cc.cc1234.dao.model.User;
 import org.springframework.stereotype.Service;
