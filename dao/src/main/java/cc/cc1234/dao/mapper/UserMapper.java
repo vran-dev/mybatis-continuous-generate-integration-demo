@@ -1,22 +1,21 @@
 package cc.cc1234.dao.mapper;
 
-import cc.cc1234.dao.model.UserEntity;
+import cc.cc1234.dao.model.User;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
-public interface UserMapper extends UserEntityMapper {
+public interface UserMapper extends BaseMapper<User> {
 
-    UserEntity selectByUsername(String username);
+    User selectByUsername(String username);
 
     long countUser();
 
     @Select("select * from user limit #{offset}, #{size}")
-    List<UserEntity> selectByPage(@Param("offset") Integer offset,
-                                  @Param("size") Integer size);
-
-    @Select(value = "select * from user")
-    List<UserEntity> selectAll();
+    @ResultMap("BaseResultMap")
+    List<User> selectByPage(@Param("offset") Integer offset,
+                            @Param("size") Integer size);
 
 }

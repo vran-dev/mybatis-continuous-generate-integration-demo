@@ -2,7 +2,7 @@ package cc.cc1234.api.controller;
 
 import cc.cc1234.api.vo.UserSaveRequest;
 import cc.cc1234.core.service.UserService;
-import cc.cc1234.dao.model.UserEntity;
+import cc.cc1234.dao.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +18,8 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/users")
-    public List<UserEntity> getUsername(@RequestParam(defaultValue = "1") Integer page,
-                                        @RequestParam(defaultValue = "20") Integer size) {
+    public List<User> getUsername(@RequestParam(defaultValue = "1") Integer page,
+                                  @RequestParam(defaultValue = "20") Integer size) {
         return userService.listUsers(page, size);
     }
 
@@ -29,12 +29,12 @@ public class UserController {
     }
 
     @GetMapping("/users/{username}")
-    public UserEntity findByUsername(@PathVariable String username) {
+    public User findByUsername(@PathVariable String username) {
         return userService.findByUsername(username);
     }
 
     @PostMapping("/users")
-    public UserEntity saveUser(@RequestBody @Valid UserSaveRequest request) {
+    public User saveUser(@RequestBody @Valid UserSaveRequest request) {
         return userService.saveUser(request.getUsername(), request.getGender());
     }
 }

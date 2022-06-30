@@ -28,11 +28,12 @@ subprojects {
             implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc', version: '2.5.4'
             implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.5.4'
             implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '2.5.4'
+            testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.5.4'
 
             // mybatis
             implementation group: 'org.mybatis.spring.boot', name: 'mybatis-spring-boot-starter', version: '2.2.0'
             implementation 'org.mybatis:mybatis:3.5.7'
-            implementation group: 'org.mybatis.generator', name: 'mybatis-generator-core', version: '1.4.0'
+            implementation group: 'org.mybatis.generator', name: 'mybatis-generator-core', version: '1.4.1'
 
             // datasource
             implementation group: 'com.zaxxer', name: 'HikariCP', version: '5.0.0'

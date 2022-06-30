@@ -8,24 +8,15 @@ mybatisGenerator {
     configFile = 'src/main/resources/mybatis-generator.xml'
 
     dependencies {
-        mybatisGenerator group: 'org.mybatis.generator', name: 'mybatis-generator-core', version: '1.4.0'
-        mybatisGenerator group: 'mysql', name: 'mysql-connector-java', version: '8.0.25'
         mybatisGenerator project(":generator-plugin")
-    }
-}
-
-mbGenerator.dependsOn {
-    System.setProperty("mybatis.generator.baseDir", projectDir.getAbsolutePath())
-
-    file("src/generator/java")?.list()?.each {
-        f -> delete "src/generator/java/${f}"
-    }
-    file("src/generator/resources")?.list()?.each {
-        f -> delete "src/generator/resources/${f}"
+        mybatisGenerator group: 'org.mybatis.generator', name: 'mybatis-generator-core', version: '1.4.1'
+        mybatisGenerator group: 'mysql', name: 'mysql-connector-java', version: '8.0.25'
     }
 }
 
 dependencies {
+    implementation project(":generator-plugin")
+
     // mybatis
     implementation group: 'org.mybatis.spring.boot', name: 'mybatis-spring-boot-starter'
     implementation group: 'org.mybatis', name: 'mybatis'
@@ -39,8 +30,35 @@ dependencies {
 
 sourceSets {
     main {
-        java.srcDirs += ['src/generator/java']
-        resources.srcDirs += ['src/generator/resources']
+        java.srcDirs += ['src/generated/java']
+        resources.srcDirs += ['src/generated/resources']
     }
 }
 
+tasks.mbGenerator.doFirst {
+    def javaDir = "src/generated/java"
+    def resourceDir = "src/generated/resources"
+    def absoluteJavaDir = projectDir.getAbsolutePath() + "/" + javaDir
+    def absoluteResourceDir = projectDir.getAbsolutePath() + "/" + resourceDir
+
+    // 配置环境变量
+    System.setProperty("mybatis.generator.baseDir", projectDir.getAbsolutePath())
+    System.setProperty("mybatis.generator.javaProjectDir", absoluteJavaDir)
+    System.setProperty("mybatis.generator.javaResourceDir", absoluteResourceDir)
+    System.setProperty("mybatis.generator.model.package", "cc.cc1234.dao.model")
+    System.setProperty("mybatis.generator.mapper.package", "cc.cc1234.dao.mapper")
+
+    // 清理旧文件
+    def javaDirFile = file(javaDir)
+    if (javaDirFile.exists()) {
+        javaDirFile.deleteDir()
+        delete(javaDirFile)
+    }
+    mkdir(javaDirFile)
+
+    def resourceDirFile = file(resourceDir)
+    if (resourceDirFile.exists()) {
+        delete(resourceDir)
+    }
+    mkdir(resourceDir)
+}

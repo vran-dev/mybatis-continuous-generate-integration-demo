@@ -7,7 +7,7 @@
         from user
     </select>
 
-    <select id="selectByUsername" resultType="cc.cc1234.dao.model.UserEntity">
+    <select id="selectByUsername" resultMap="BaseResultMap">
         select *
         from user
         where username = #{username}
