@@ -1,10 +1,13 @@
 package cc.cc1234.mybatis.plugin;
 
+import cc.cc1234.mybatis.plugin.generator.SelectOneByExampleXmlElementGenerator;
 import org.mybatis.generator.api.GeneratedJavaFile;
 import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.PluginAdapter;
 import org.mybatis.generator.api.dom.DefaultJavaFormatter;
 import org.mybatis.generator.api.dom.java.*;
+import org.mybatis.generator.api.dom.xml.Document;
+import org.mybatis.generator.api.dom.xml.XmlElement;
 
 import java.io.File;
 import java.util.Collections;
@@ -14,17 +17,18 @@ import java.util.Objects;
 public class MybatisOneMapperPlugin extends PluginAdapter {
 
     private static final String BASE_PACKAGE_PROP = "base-mapper.target.package";
+
     private static final String BASE_PROJECT_PROP = "base-mapper.target.project";
 
     private static final String BASE_MAPPER_NAME_PROP = "base-mapper.name";
 
-    private static final String TABLE_PACKAGE_PROP = "table-mapper.target.package";
+    private static final String JAVA_MAPPER_PACKAGE_PROP = "java-mapper.target.package";
 
-    private static final String TABLE_PROJECT_PROP = "table-mapper.target.project";
+    private static final String JAVA_MAPPER_PROJECT_PROP = "java-mapper.target.project";
 
-    private static final String DOMAIN_MAPPER_GENERATE_PROP = "domain-mapper.generate";
+    private static final String JAVA_MAPPER_GENERATE_PROP = "java-mapper.generate";
 
-    private static final String DOMAIN_MAPPER_OVERRIDE_PROP = "domain-mapper.override";
+    private static final String JAVA_MAPPER_OVERRIDE_PROP = "java-mapper.override";
 
     private List<String> warnings;
 
@@ -32,6 +36,22 @@ public class MybatisOneMapperPlugin extends PluginAdapter {
     public boolean validate(List<String> warnings) {
         this.warnings = warnings;
         return true;
+    }
+
+    @Override
+    public void initialized(IntrospectedTable introspectedTable) {
+        String isGenerateJavaMapper = super.properties.getProperty(JAVA_MAPPER_GENERATE_PROP, "true");
+        if (!Objects.equals(isGenerateJavaMapper, "true")) {
+            return;
+        }
+
+        // xml mapper namespace
+        String javaMapperPackage = super.properties.getProperty(JAVA_MAPPER_PACKAGE_PROP);
+        String originalNamespace = introspectedTable.getMyBatis3SqlMapNamespace();
+        int idx = originalNamespace.lastIndexOf(".");
+        String mapperInterfaceName = originalNamespace.substring(idx + 1);
+        String newNamespace = javaMapperPackage + "." + mapperInterfaceName;
+        introspectedTable.setMyBatis3JavaMapperType(newNamespace);
     }
 
     @Override
@@ -88,6 +108,8 @@ public class MybatisOneMapperPlugin extends PluginAdapter {
         selectByExample.setAbstract(true);
         baseMapperInterface.addMethod(selectByExample);
 
+        baseMapperInterface.addMethod(selectOneByExample(baseMapperInterface));
+
         // T selectByPrimaryKey(Long id);
         Method selectByPrimaryKey = new Method("selectByPrimaryKey");
         selectByPrimaryKey.setReturnType(new FullyQualifiedJavaType("T"));
@@ -96,23 +118,11 @@ public class MybatisOneMapperPlugin extends PluginAdapter {
         selectByPrimaryKey.setAbstract(true);
         baseMapperInterface.addMethod(selectByPrimaryKey);
 
-        // int updateByExampleSelecti"ve(@Param("row") T row, @Param("example") E example);
-        Method updateByExampleSelective = new Method("updateByExampleSelective");
-        updateByExampleSelective.setReturnType(new FullyQualifiedJavaType("int"));
-        updateByExampleSelective.addParameter(
-                new Parameter(new FullyQualifiedJavaType("T"), "row"));
-        updateByExampleSelective.addParameter(
-                new Parameter(new FullyQualifiedJavaType("E"), "example"));
-        updateByExampleSelective.setAbstract(true);
-        baseMapperInterface.addMethod(updateByExampleSelective);
+        // int updateByExampleSelective(@Param("row") T row, @Param("example") E example);
+        baseMapperInterface.addMethod(updateByExampleSelective());
 
         // int updateByExample(@Param("row") T row, @Param("example") E example);
-        Method updateByExample = new Method("updateByExample");
-        updateByExample.setReturnType(new FullyQualifiedJavaType("int"));
-        updateByExample.addParameter(new Parameter(new FullyQualifiedJavaType("T"), "row"));
-        updateByExample.addParameter(new Parameter(new FullyQualifiedJavaType("E"), "example"));
-        updateByExample.setAbstract(true);
-        baseMapperInterface.addMethod(updateByExample);
+        baseMapperInterface.addMethod(updateByExample());
 
         // int updateByPrimaryKeySelective(T row);
         Method updateByPrimaryKeySelective = new Method("updateByPrimaryKeySelective");
@@ -144,42 +154,98 @@ public class MybatisOneMapperPlugin extends PluginAdapter {
         return Collections.singletonList(baseMapperJavaFile);
     }
 
+    private Method selectOneByExample(Interface baseMapperInterface) {
+        Method selectOneByExample = new Method("selectOneByExample");
+        baseMapperInterface.addImportedType(new FullyQualifiedJavaType("java.util.Optional"));
+        selectOneByExample.setReturnType(new FullyQualifiedJavaType("Optional<T>"));
+
+        Parameter exampleParam = new Parameter(new FullyQualifiedJavaType("E"), "example");
+        selectOneByExample.addParameter(exampleParam);
+
+        selectOneByExample.setAbstract(true);
+        return selectOneByExample;
+    }
+
+    private Method updateByExampleSelective() {
+        Method updateByExampleSelective = new Method("updateByExampleSelective");
+        updateByExampleSelective.setReturnType(new FullyQualifiedJavaType("int"));
+
+        Parameter rowParam = new Parameter(new FullyQualifiedJavaType("T"), "row");
+        rowParam.addAnnotation("@Param(\"row\")");
+        updateByExampleSelective.addParameter(rowParam);
+
+        Parameter exampleParam = new Parameter(new FullyQualifiedJavaType("E"), "example");
+        exampleParam.addAnnotation("@Param(\"example\")");
+        updateByExampleSelective.addParameter(exampleParam);
+
+        updateByExampleSelective.setAbstract(true);
+        return updateByExampleSelective;
+    }
+
+    private Method updateByExample() {
+        Method updateByExample = new Method("updateByExample");
+        updateByExample.setReturnType(new FullyQualifiedJavaType("int"));
+
+        Parameter rowParam = new Parameter(new FullyQualifiedJavaType("T"), "row");
+        updateByExample.addParameter(rowParam);
+        rowParam.addAnnotation("@Param(\"row\")");
+
+        Parameter exampleParam = new Parameter(new FullyQualifiedJavaType("E"), "example");
+        exampleParam.addAnnotation("@Param(\"example\")");
+        updateByExample.addParameter(exampleParam);
+
+        updateByExample.setAbstract(true);
+        return updateByExample;
+    }
+
+    @Override
+    public boolean sqlMapDocumentGenerated(Document document, IntrospectedTable introspectedTable) {
+        // selectOneByExample
+        XmlElement mapperParent = document.getRootElement();
+        SelectOneByExampleXmlElementGenerator generator = new SelectOneByExampleXmlElementGenerator();
+        generator.setContext(context);
+        generator.setWarnings(warnings);
+        generator.setIntrospectedTable(introspectedTable);
+        generator.addElements(mapperParent);
+        return true;
+    }
+
     @Override
     public List<GeneratedJavaFile> contextGenerateAdditionalJavaFiles(IntrospectedTable introspectedTable) {
-        String isGenerateDomainMapper = super.properties.getProperty(DOMAIN_MAPPER_GENERATE_PROP, "true");
-        if (!Objects.equals(isGenerateDomainMapper, "true")) {
+        String isGenerateJavaMapper = super.properties.getProperty(JAVA_MAPPER_GENERATE_PROP, "true");
+        if (!Objects.equals(isGenerateJavaMapper, "true")) {
             return Collections.emptyList();
         }
 
-        String domainMapperProject = super.properties.getProperty(TABLE_PROJECT_PROP);
-        String domainMapperPackage = super.properties.getProperty(TABLE_PACKAGE_PROP);
+        String javaMapperProject = super.properties.getProperty(JAVA_MAPPER_PROJECT_PROP);
+        String javaMapperPackage = super.properties.getProperty(JAVA_MAPPER_PACKAGE_PROP);
 
         String xmlNamespace = introspectedTable.getMyBatis3SqlMapNamespace();
         int idx = xmlNamespace.lastIndexOf(".");
         String interfaceName = xmlNamespace.substring(idx + 1);
 
         boolean allowOverride =
-                Boolean.parseBoolean(super.properties.getProperty(DOMAIN_MAPPER_OVERRIDE_PROP, "false"));
-        if (tableMapperExists(domainMapperProject, domainMapperPackage, interfaceName)) {
+                Boolean.parseBoolean(super.properties.getProperty(JAVA_MAPPER_OVERRIDE_PROP, "false"));
+        if (javaMapperExists(javaMapperProject, javaMapperPackage, interfaceName)) {
             if (!allowOverride) {
                 return Collections.emptyList();
             }
-            warnings.add("Domain mapper interface "
+            warnings.add("java mapper interface "
                     + interfaceName
                     + " already exists in "
-                    + domainMapperProject
+                    + javaMapperProject
                     + " and will be overridden.");
         }
 
-        String fullInterfaceName = domainMapperPackage + "." + interfaceName;
+        String fullInterfaceName = javaMapperPackage + "." + interfaceName;
         Interface baseMapperInterface = new Interface(new FullyQualifiedJavaType(fullInterfaceName));
         baseMapperInterface.setVisibility(JavaVisibility.PUBLIC);
 
         // import BaseMapper
-        String mapperPackage = super.properties.getProperty(BASE_PACKAGE_PROP);
+        String baseMapperPackage = super.properties.getProperty(BASE_PACKAGE_PROP);
         String baseMapperName = super.properties.getProperty(BASE_MAPPER_NAME_PROP, "BaseMapper");
         baseMapperInterface.addImportedType(
-                new FullyQualifiedJavaType(mapperPackage + "." + baseMapperName));
+                new FullyQualifiedJavaType(baseMapperPackage + "." + baseMapperName));
 
         // extends BaseMapper<Pojo, Example>
         String baseRecordType = introspectedTable.getBaseRecordType();
@@ -194,13 +260,13 @@ public class MybatisOneMapperPlugin extends PluginAdapter {
 
         GeneratedJavaFile baseMapperJavaFile = new GeneratedJavaFile(
                 baseMapperInterface,
-                domainMapperProject,
+                javaMapperProject,
                 new DefaultJavaFormatter()
         );
         return Collections.singletonList(baseMapperJavaFile);
     }
 
-    private boolean tableMapperExists(String mapperProject, String mapperPackage, String mapperName) {
+    private boolean javaMapperExists(String mapperProject, String mapperPackage, String mapperName) {
         String mapperPackagePath = mapperPackage.replace(".", File.separator);
         String fileName = mapperProject + File.separator
                 + mapperPackagePath + File.separator
@@ -208,3 +274,4 @@ public class MybatisOneMapperPlugin extends PluginAdapter {
         return new File(fileName).exists();
     }
 }
+

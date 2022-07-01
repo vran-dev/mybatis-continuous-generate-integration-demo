@@ -10,15 +10,13 @@
         <property name="javaFileEncoding" value="UTF-8"/>
 
         <!-- default plugins -->
-        <plugin type="cc.cc1234.mybatis.plugin.XmlMapperCustomizePlugin">
-            <property name="namespace.package" value="cc.cc1234.dao.mapper"/>
-        </plugin>
+        <plugin type="cc.cc1234.mybatis.plugin.XmlMapperRenamePlugin"/>
         <plugin type="cc.cc1234.mybatis.plugin.MybatisOneMapperPlugin">
             <property name="base-mapper.target.project" value="${mybatis.generator.javaProjectDir}"/>
             <property name="base-mapper.target.package" value="${mybatis.generator.mapper.package}"/>
             <property name="base-mapper.name" value="OneMapper"/>
-            <property name="table-mapper.target.project" value="src/main/java"/>
-            <property name="table-mapper.target.package" value="${mybatis.generator.mapper.package}"/>
+            <property name="java-mapper.target.project" value="src/main/java"/>
+            <property name="java-mapper.target.package" value="${mybatis.generator.mapper.package}"/>
         </plugin>
         <plugin type="cc.cc1234.mybatis.plugin.NullSafePlugin">
             <property name="ignoreColumns"
@@ -50,12 +48,16 @@
                          targetProject="${mybatis.generator.javaResourceDir}"/>
 
         <table tableName="%">
+            <generatedKey column="id" sqlStatement="JDBC"/>
         </table>
         <!-- Table Configuration -->
-        <table tableName="user"
-               delimitIdentifiers="false">
-            <columnOverride column="gender" javaType="cc.cc1234.dao.enums.Gender"
-                            typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+        <table tableName="user" delimitIdentifiers="false">
+            <generatedKey column="id" sqlStatement="JDBC"/>
+            <columnOverride column="gender"
+                            javaType="cc.cc1234.dao.enums.Gender"
+                            typeHandler="org.apache.ibatis.type.EnumTypeHandler">
+                <property name="forceJavaTypeIntoMapping" value="true"/>
+            </columnOverride>
         </table>
     </context>
 </generatorConfiguration>
