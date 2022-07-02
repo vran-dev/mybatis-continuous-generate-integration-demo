@@ -11,7 +11,8 @@
 
         <!-- default plugins -->
         <plugin type="cc.cc1234.mybatis.plugin.XmlMapperRenamePlugin"/>
-        <plugin type="cc.cc1234.mybatis.plugin.MybatisOneMapperPlugin">
+        <plugin type="cc.cc1234.mybatis.plugin.ExampleModelPlusPlugin"/>
+        <plugin type="cc.cc1234.mybatis.plugin.MapperPlusPlugin">
             <property name="base-mapper.target.project" value="${mybatis.generator.javaProjectDir}"/>
             <property name="base-mapper.target.package" value="${mybatis.generator.mapper.package}"/>
             <property name="base-mapper.name" value="OneMapper"/>

@@ -13,6 +13,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -52,10 +53,36 @@ public class UserMapperTest {
         userMapper.insertSelective(user);
         Assertions.assertNotNull(user.getId());
 
-        UserExample example = new UserExample();
-        example.createCriteria()
-                .andUsernameEqualTo(user.getUsername());
+        UserExample example = UserExample.create()
+                .createCriteria()
+                .andUsernameEqualTo(user.getUsername())
+                .example()
+                .orderBy()
+                .idDesc()
+                .example();
         Optional<User> userOption = userMapper.selectOneByExample(example);
         Assertions.assertTrue(userOption.isPresent());
+    }
+
+    public void testSelectByExample() {
+        UserExample example = new UserExample();
+        example.createCriteria()
+                .andUsernameLike("root%")
+                .andCreateAtLessThan(LocalDateTime.now());
+        example.setOrderByClause("id desc, create_at desc");
+        userMapper.selectByExample(example);
+    }
+
+    public void testSelectByExample2() {
+        UserExample example = UserExample.create()
+                .createCriteria()
+                .andUsernameLike("root%")
+                .andCreateAtLessThan(LocalDateTime.now())
+                .example()
+                .orderBy()
+                .idDesc()
+                .createAtDesc()
+                .example();
+        userMapper.selectByExample(example);
     }
 }
