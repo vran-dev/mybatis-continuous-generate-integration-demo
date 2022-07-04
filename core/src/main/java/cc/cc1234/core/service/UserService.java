@@ -3,6 +3,7 @@ package cc.cc1234.core.service;
 import cc.cc1234.dao.enums.Gender;
 import cc.cc1234.dao.mapper.AddressMapper;
 import cc.cc1234.dao.mapper.UserMapper;
+import cc.cc1234.dao.model.Address;
 import cc.cc1234.dao.model.AddressExample;
 import cc.cc1234.dao.model.User;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,12 @@ public class UserService {
         entity.setUsername(username);
         entity.setGender(gender);
         userMapper.insertSelective(entity);
+
+        AddressExample example = new AddressExample();
+        example.createCriteria()
+                .andCityIsNotNull();
+        example.setOrderByClause("create_at desc");
+        List<Address> addresses = addressMapper.selectByExample(example);
         return userMapper.selectByPrimaryKey(entity.getId());
     }
 }

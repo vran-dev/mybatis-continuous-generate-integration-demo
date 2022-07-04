@@ -19,11 +19,11 @@ import java.util.*;
  */
 public class NullSafePlugin extends PluginAdapter {
 
-    private static final String IGNORE_COLUMN_PROP = "ignoreColumns";
+    private static final String IGNORE_COLUMN_PROP = "ignore.columns";
 
-    private static final String ADD_SPRING_NULLABLE_ANNOTATION = "addSpringNullableAnnotation";
+    private static final String ADD_SPRING_NULLABLE_ANNOTATION = "spring.nullable";
 
-    private static final String ADD_OPTIONAL_GETTER = "addOptionalGetter";
+    private static final String ADD_OPTIONAL_GETTER = "optional.getter";
 
     private static final String ALL = "*";
 

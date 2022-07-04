@@ -10,7 +10,6 @@
         <property name="javaFileEncoding" value="UTF-8"/>
 
         <!-- default plugins -->
-        <plugin type="cc.cc1234.mybatis.plugin.XmlMapperRenamePlugin"/>
         <plugin type="cc.cc1234.mybatis.plugin.ExampleModelPlusPlugin"/>
         <plugin type="cc.cc1234.mybatis.plugin.MapperPlusPlugin">
             <property name="base-mapper.target.project" value="${mybatis.generator.javaProjectDir}"/>

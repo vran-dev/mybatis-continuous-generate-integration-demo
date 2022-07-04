@@ -46,14 +46,8 @@ public class MapperPlusPlugin extends PluginAdapter {
         if (!Objects.equals(isGenerateJavaMapper, "true")) {
             return;
         }
-
-        // xml mapper namespace
-        String javaMapperPackage = super.properties.getProperty(JAVA_MAPPER_PACKAGE_PROP);
-        String originalNamespace = introspectedTable.getMyBatis3SqlMapNamespace();
-        int idx = originalNamespace.lastIndexOf(".");
-        String mapperInterfaceName = originalNamespace.substring(idx + 1);
-        String newNamespace = javaMapperPackage + "." + mapperInterfaceName;
-        introspectedTable.setMyBatis3JavaMapperType(newNamespace);
+        overrideXmlFileName(introspectedTable);
+        overrideXmlNamespace(introspectedTable);
     }
 
     @Override
@@ -66,20 +60,24 @@ public class MapperPlusPlugin extends PluginAdapter {
         // BaseMapper<T, E>
         baseMapperInterface.addTypeParameter(new TypeParameter("T"));
         baseMapperInterface.addTypeParameter(new TypeParameter("E"));
-
+        // count
         addCountByExample(baseMapperInterface);
+        // delete
         addDeleteByExample(baseMapperInterface);
         addDeleteByPrimaryKey(baseMapperInterface);
+        // insert
         addInsert(baseMapperInterface);
         addInsertSelective(baseMapperInterface);
+        // select
         addSelectByExample(baseMapperInterface);
         addSelectOneByExample(baseMapperInterface);
         addSelectByPrimaryKey(baseMapperInterface);
+        // update
         addUpdateByExampleSelective(baseMapperInterface);
         addUpdateByExample(baseMapperInterface);
         addUpdateByPrimaryKeySelective(baseMapperInterface);
         addUpdateByPrimaryKey(baseMapperInterface);
-
+        // import
         baseMapperInterface.addImportedType(
                 new FullyQualifiedJavaType("org.apache.ibatis.annotations.Param"));
         baseMapperInterface.addImportedType(
@@ -93,6 +91,22 @@ public class MapperPlusPlugin extends PluginAdapter {
                 new DefaultJavaFormatter()
         );
         return Collections.singletonList(baseMapperJavaFile);
+    }
+
+    protected void overrideXmlFileName(IntrospectedTable introspectedTable) {
+        String xmlMapperFileName = introspectedTable.getMyBatis3XmlMapperFileName();
+        String newXmlMapperFileName =
+                xmlMapperFileName.replace("Mapper.xml", "GeneratedMapper.xml");
+        introspectedTable.setMyBatis3XmlMapperFileName(newXmlMapperFileName);
+    }
+
+    private void overrideXmlNamespace(IntrospectedTable introspectedTable) {
+        String javaMapperPackage = super.properties.getProperty(JAVA_MAPPER_PACKAGE_PROP);
+        String originalNamespace = introspectedTable.getMyBatis3SqlMapNamespace();
+        int idx = originalNamespace.lastIndexOf(".");
+        String mapperInterfaceName = originalNamespace.substring(idx + 1);
+        String newNamespace = javaMapperPackage + "." + mapperInterfaceName;
+        introspectedTable.setMyBatis3JavaMapperType(newNamespace);
     }
 
     private void addUpdateByPrimaryKey(Interface baseMapperInterface) {

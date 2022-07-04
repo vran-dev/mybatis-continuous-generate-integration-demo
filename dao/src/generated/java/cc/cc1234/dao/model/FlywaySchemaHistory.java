@@ -1,12 +1,10 @@
 package cc.cc1234.dao.model;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.lang.Nullable;
 
 /**
  *
@@ -34,7 +32,6 @@ public class FlywaySchemaHistory {
      *
      * @mbg.generated
      */
-    @Nullable
     private String version;
 
     /**
@@ -71,7 +68,6 @@ public class FlywaySchemaHistory {
      *
      * @mbg.generated
      */
-    @Nullable
     private Integer checksum;
 
     /**
@@ -109,12 +105,4 @@ public class FlywaySchemaHistory {
      * @mbg.generated
      */
     private Boolean success;
-
-    public Optional<String> getVersionOptional() {
-        return Optional.ofNullable(version);
-    }
-
-    public Optional<Integer> getChecksumOptional() {
-        return Optional.ofNullable(checksum);
-    }
 }
