@@ -8,6 +8,8 @@ import javax.validation.constraints.NotNull;
 @Data
 public class UserSaveRequest {
 
+    private Long id;
+
     @NotNull
     private String username;
 

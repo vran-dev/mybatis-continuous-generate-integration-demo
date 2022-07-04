@@ -17,6 +17,8 @@ mybatisGenerator {
 dependencies {
     implementation project(":generator-plugin")
 
+    implementation group: 'com.github.jsqlparser', name: 'jsqlparser', version: '4.4'
+
     // mybatis
     implementation group: 'org.mybatis.spring.boot', name: 'mybatis-spring-boot-starter'
     implementation group: 'org.mybatis', name: 'mybatis'

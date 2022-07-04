@@ -6,6 +6,7 @@ import cc.cc1234.dao.mapper.UserMapper;
 import cc.cc1234.dao.model.Address;
 import cc.cc1234.dao.model.AddressExample;
 import cc.cc1234.dao.model.User;
+import cc.cc1234.dao.model.UserExample;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -46,5 +47,15 @@ public class UserService {
         example.setOrderByClause("create_at desc");
         List<Address> addresses = addressMapper.selectByExample(example);
         return userMapper.selectByPrimaryKey(entity.getId());
+    }
+
+    public void saveUser(Long id, String username) {
+        User row = User.builder()
+                .username(username)
+                .build();
+        UserExample example = UserExample.create()
+                .createCriteria()
+                .andIdEqualTo(id).example();
+        userMapper.updateByExampleSelective(row, example);
     }
 }

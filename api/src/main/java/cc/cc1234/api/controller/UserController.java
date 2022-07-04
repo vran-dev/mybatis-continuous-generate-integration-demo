@@ -37,4 +37,9 @@ public class UserController {
     public User saveUser(@RequestBody @Valid UserSaveRequest request) {
         return userService.saveUser(request.getUsername(), request.getGender());
     }
+
+    @PatchMapping("/users")
+    public void updateUsr(@RequestBody UserSaveRequest request) {
+        userService.saveUser(request.getId(), request.getUsername());
+    }
 }
