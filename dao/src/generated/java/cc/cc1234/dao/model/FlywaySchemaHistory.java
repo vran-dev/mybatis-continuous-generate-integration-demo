@@ -1,6 +1,7 @@
 package cc.cc1234.dao.model;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -105,4 +106,12 @@ public class FlywaySchemaHistory {
      * @mbg.generated
      */
     private Boolean success;
+
+    public Optional<String> getVersionOptional() {
+        return Optional.ofNullable(version);
+    }
+
+    public Optional<Integer> getChecksumOptional() {
+        return Optional.ofNullable(checksum);
+    }
 }

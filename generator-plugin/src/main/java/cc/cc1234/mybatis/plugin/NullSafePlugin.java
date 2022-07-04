@@ -40,6 +40,10 @@ public class NullSafePlugin extends PluginAdapter {
 
     @Override
     public void initialized(IntrospectedTable introspectedTable) {
+        addSpringNullableAnnotation = Boolean.parseBoolean(
+                properties.getOrDefault(ADD_SPRING_NULLABLE_ANNOTATION, "false").toString());
+        addOptionalGetter = Boolean.parseBoolean(
+                properties.getOrDefault(ADD_OPTIONAL_GETTER, "true").toString());
         String ignoreColumns = (String) super.properties.getOrDefault(IGNORE_COLUMN_PROP, "");
         if (ignoreColumns.isEmpty()) {
             return;
@@ -57,11 +61,6 @@ public class NullSafePlugin extends PluginAdapter {
             Set<String> values = ignoredTableColumns.computeIfAbsent(tableName, k -> new HashSet<>());
             values.add(columnName);
         }
-
-        addSpringNullableAnnotation = Boolean.parseBoolean(
-                properties.getOrDefault(ADD_SPRING_NULLABLE_ANNOTATION, "false").toString());
-        addOptionalGetter = Boolean.parseBoolean(
-                properties.getOrDefault(ADD_OPTIONAL_GETTER, "true").toString());
     }
 
     @Override

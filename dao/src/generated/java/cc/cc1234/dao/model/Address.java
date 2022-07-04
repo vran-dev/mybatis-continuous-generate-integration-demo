@@ -1,6 +1,7 @@
 package cc.cc1234.dao.model;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -96,4 +97,8 @@ public class Address {
      * @mbg.generated
      */
     private LocalDateTime updateAt;
+
+    public Optional<String> getPostCodeOptional() {
+        return Optional.ofNullable(postCode);
+    }
 }

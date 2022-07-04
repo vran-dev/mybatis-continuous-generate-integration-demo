@@ -21,8 +21,6 @@
         <plugin type="cc.cc1234.mybatis.plugin.NullSafePlugin">
             <property name="ignoreColumns"
                       value="*.create_time,*.update_time,*.create_at,*.active_from,*.active_to,*.operation_time,point_rule.start_time,point_rule.end_time,*.event_properties,*.reward,*."/>
-            <property name="addOptionalGetter" value="true"/>
-            <property name="addSpringNullableAnnotation" value="true"/>
         </plugin>
         <plugin type="cc.cc1234.mybatis.plugin.LombokPlugin"/>
 
