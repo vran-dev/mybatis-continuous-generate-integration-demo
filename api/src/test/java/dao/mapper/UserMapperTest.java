@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +18,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
-@SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@SpringBootTest(classes = Application.class)
 @ExtendWith(SpringExtension.class)
 @Transactional
 public class UserMapperTest {
@@ -64,6 +65,10 @@ public class UserMapperTest {
         Assertions.assertTrue(userOption.isPresent());
     }
 
+    @Test
+    @Sql(statements = {
+            "INSERT INTO user(username, gender) VALUES('roo', 'MALE')"
+    })
     public void testSelectByExample() {
         UserExample example = new UserExample();
         example.createCriteria()
@@ -73,6 +78,11 @@ public class UserMapperTest {
         userMapper.selectByExample(example);
     }
 
+    @Test
+    @Sql(statements = {
+            "INSERT INTO user(username, gender) VALUES('roo', 'MALE')",
+            "INSERT INTO user(username, gender) VALUES('dev', 'FEMALE')",
+    })
     public void testSelectByExample2() {
         UserExample example = UserExample.create()
                 .createCriteria()

@@ -4,9 +4,15 @@ import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.PluginAdapter;
 import org.mybatis.generator.api.dom.java.*;
+import org.mybatis.generator.api.dom.xml.Attribute;
+import org.mybatis.generator.api.dom.xml.TextElement;
+import org.mybatis.generator.api.dom.xml.VisitableElement;
+import org.mybatis.generator.api.dom.xml.XmlElement;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * 1. add <b>example()</b> method in Criteria
@@ -47,6 +53,81 @@ public class ExampleModelPlusPlugin extends PluginAdapter {
             addOrderByCriteriaClassInExample(topLevelClass, introspectedTable);
             updateGetOrderByClause(topLevelClass);
             updateSetOrderByClause(topLevelClass);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean sqlMapExampleWhereClauseElementGenerated(XmlElement element, IntrospectedTable introspectedTable) {
+        // add javaType to ExampleWhereClauseElement
+        for (IntrospectedColumn column : introspectedTable.getAllColumns()) {
+            if (column.getTypeHandler() != null) {
+                XmlElement whereElement = (XmlElement) element.getElements()
+                        .stream()
+                        .filter(ele -> ele instanceof XmlElement)
+                        .findFirst()
+                        .orElse(null);
+                if (whereElement == null) {
+                    return true;
+                }
+                XmlElement foreachElement = (XmlElement) whereElement.getElements().iterator().next();
+                XmlElement ifElement = (XmlElement) foreachElement.getElements().iterator().next();
+                XmlElement trimElement = (XmlElement) ifElement.getElements().iterator().next();
+                List<XmlElement> otherTypeCriteriaElements = trimElement.getElements()
+                        .stream()
+                        .map(XmlElement.class::cast)
+                        .filter(f -> f.getAttributes()
+                                .stream()
+                                .filter(attr -> "collection".equals(attr.getName()))
+                                .noneMatch(attr -> "criteria.criteria".equals(attr.getValue())))
+                        .collect(Collectors.toList());
+                for (XmlElement otherTypeCriteriaElement : otherTypeCriteriaElements) {
+                    XmlElement chooseElement = (XmlElement) otherTypeCriteriaElement.getElements().iterator().next();
+                    for (VisitableElement chooseChild : chooseElement.getElements()) {
+                        XmlElement child = XmlElement.class.cast(chooseChild);
+                        Optional<Attribute> testAttrOption = child.getAttributes()
+                                .stream()
+                                .filter(attr -> "test".equals(attr.getName()))
+                                .findFirst();
+                        if (testAttrOption.isPresent()) {
+                            Attribute testAttr = testAttrOption.get();
+                            if ("criterion.singleValue".equals(testAttr.getValue())) {
+                                String pattern =
+                                        "and ${criterion.condition} #{criterion.value,typeHandler=%s,javaType=%s}";
+                                String statement = String.format(pattern,
+                                        column.getTypeHandler(),
+                                        column.getFullyQualifiedJavaType().getFullyQualifiedName());
+                                child.getElements().clear();
+                                child.getElements().add(new TextElement(statement));
+                            } else if ("criterion.betweenValue".equals(testAttr.getValue())) {
+                                String pattern =
+                                        "and ${criterion.condition} #{criterion.value,typeHandler=%s,javaType=%s}"
+                                                + " and #{criterion.secondValue,typeHandler=%s,javaType=%s}";
+                                String statement = String.format(pattern,
+                                        column.getTypeHandler(),
+                                        column.getFullyQualifiedJavaType().getFullyQualifiedName(),
+                                        column.getTypeHandler(),
+                                        column.getFullyQualifiedJavaType().getFullyQualifiedName());
+                                child.getElements().clear();
+                                child.getElements().add(new TextElement(statement));
+                            } else if ("criterion.listValue".equals(testAttr.getValue())) {
+                                String pattern = " #{listItem,typeHandler=%s,javaType=%s}";
+                                String statement = String.format(pattern,
+                                        column.getTypeHandler(),
+                                        column.getFullyQualifiedJavaType().getFullyQualifiedName());
+                                child.getElements()
+                                        .stream()
+                                        .filter(ele -> ele instanceof XmlElement)
+                                        .forEach(ele -> {
+                                            XmlElement childForeach = (XmlElement) ele;
+                                            childForeach.getElements().clear();
+                                            childForeach.getElements().add(new TextElement(statement));
+                                        });
+                            }
+                        }
+                    }
+                }
+            }
         }
         return true;
     }

@@ -46,15 +46,15 @@
                   and ${criterion.condition}
                 </when>
                 <when test="criterion.singleValue">
-                  and ${criterion.condition} #{criterion.value,typeHandler=org.apache.ibatis.type.EnumTypeHandler}
+                  and ${criterion.condition} #{criterion.value,typeHandler=org.apache.ibatis.type.EnumTypeHandler,javaType=cc.cc1234.dao.enums.Gender}
                 </when>
                 <when test="criterion.betweenValue">
-                  and ${criterion.condition} #{criterion.value,typeHandler=org.apache.ibatis.type.EnumTypeHandler} and #{criterion.secondValue,typeHandler=org.apache.ibatis.type.EnumTypeHandler}
+                  and ${criterion.condition} #{criterion.value,typeHandler=org.apache.ibatis.type.EnumTypeHandler,javaType=cc.cc1234.dao.enums.Gender} and #{criterion.secondValue,typeHandler=org.apache.ibatis.type.EnumTypeHandler,javaType=cc.cc1234.dao.enums.Gender}
                 </when>
                 <when test="criterion.listValue">
                   and ${criterion.condition}
                   <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
-                    #{listItem,typeHandler=org.apache.ibatis.type.EnumTypeHandler}
+                     #{listItem,typeHandler=org.apache.ibatis.type.EnumTypeHandler,javaType=cc.cc1234.dao.enums.Gender}
                   </foreach>
                 </when>
               </choose>
@@ -98,15 +98,15 @@
                   and ${criterion.condition}
                 </when>
                 <when test="criterion.singleValue">
-                  and ${criterion.condition} #{criterion.value,typeHandler=org.apache.ibatis.type.EnumTypeHandler}
+                  and ${criterion.condition} #{criterion.value,typeHandler=org.apache.ibatis.type.EnumTypeHandler,javaType=cc.cc1234.dao.enums.Gender}
                 </when>
                 <when test="criterion.betweenValue">
-                  and ${criterion.condition} #{criterion.value,typeHandler=org.apache.ibatis.type.EnumTypeHandler} and #{criterion.secondValue,typeHandler=org.apache.ibatis.type.EnumTypeHandler}
+                  and ${criterion.condition} #{criterion.value,typeHandler=org.apache.ibatis.type.EnumTypeHandler,javaType=cc.cc1234.dao.enums.Gender} and #{criterion.secondValue,typeHandler=org.apache.ibatis.type.EnumTypeHandler,javaType=cc.cc1234.dao.enums.Gender}
                 </when>
                 <when test="criterion.listValue">
                   and ${criterion.condition}
                   <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
-                    #{listItem,typeHandler=org.apache.ibatis.type.EnumTypeHandler}
+                     #{listItem,typeHandler=org.apache.ibatis.type.EnumTypeHandler,javaType=cc.cc1234.dao.enums.Gender}
                   </foreach>
                 </when>
               </choose>

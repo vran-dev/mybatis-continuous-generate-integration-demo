@@ -8,8 +8,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class MybatisPluginConfig {
 
-    @Bean
-    public Interceptor createAndUpdateTimeInterceptor() {
-        return new CreateAndUpdateTimeInjectPlugin();
-    }
+//    @Bean
+//    public Interceptor createAndUpdateTimeInterceptor() {
+//        return new CreateAndUpdateTimeInjectPlugin();
+//    }
 }
